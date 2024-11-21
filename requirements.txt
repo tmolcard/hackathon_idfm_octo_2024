@@ -1,2 +1,6 @@
 pandas
 requests
+SpeechRecognition==3.11.0
+streamlit==1.40.1
+PyAudio==0.2.14
+watchdog==6.0.0
