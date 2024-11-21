@@ -11,6 +11,48 @@ API_BASE_URL_PLACES = 'https://prim.iledefrance-mobilites.fr/marketplace/v2/navi
 API_BASE_URL_JOURNEY = 'https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/journeys?'
 
 
+def process_dico(response: dict) -> dict:
+    dicomax = {}
+
+    itineraire = response['journeys'][0][0]
+
+    etapes = {}
+
+    for idx, step in enumerate(itineraire["sections"]):
+        try:
+            etapes[idx] = {
+                "durée": step["duration"],
+                "arrivée": step["to"]["name"],
+                "départ": step["from"]["name"],
+                "chemin": {}
+            }
+        except:
+            continue
+        if "path" in step:
+            for idx2, _ in enumerate(step["path"]):
+                etapes[idx]["chemin"][idx2] = step["path"][idx2]["instruction"]
+            etapes[idx]["mode de mobilité"] = "marche"
+        elif step.get("mode") != "walking":
+            try:
+                etapes[idx]["chemin"]["direction"] = step["display_informations"]["direction"]
+                etapes[idx]["mode de mobilité"] = step["display_informations"]["commercial_mode"] + " " + step["display_informations"]["label"]
+            except:
+                continue
+    dicomax[f'Itineraire {itineraire['type']}'] = {
+        "duration": itineraire["duration"],
+        "nombre changement": itineraire["nb_transfers"],
+        "heure de départ": itineraire["departure_date_time"],
+        "heure d'arrivée": itineraire["arrival_date_time"],
+        "heure demandée": itineraire["requested_date_time"],
+        "distance marche": itineraire["distances"]["walking"],
+        "prix du trajet": itineraire["fare"],
+        "étapes": etapes,
+
+    }
+
+    return dicomax
+
+
 def get_place(adresse: str) -> str:
     params = {'q': adresse}
     url = API_BASE_URL_PLACES + urllib.parse.urlencode(params)
@@ -38,7 +80,8 @@ def call_riti(origin: str, destination: str, jour: str):
 
     if response.status_code != 200:
         raise ValueError(f"Error code {response.status_code}: {response.text}")
-    return pd.json_normalize(response.json())
+    response = pd.json_normalize(response.json())
+    return process_dico(response)
 
 
 if __name__ == "__main__":
@@ -50,5 +93,4 @@ if __name__ == "__main__":
     jour = "20241121T073000"
 
     response = call_riti(origin=origin, destination=destination, jour=jour)
-
-    print(response)
+    # process_dico(response)
