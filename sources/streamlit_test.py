@@ -19,7 +19,7 @@ st.markdown(
 
 # Utilisation de st.image pour charger le logo local
 st.markdown('<div class="center-logo">', unsafe_allow_html=True)
-st.image("logo1.png", width=200)  # Ajustez la largeur selon vos besoins
+st.image("logo_idfm.png", width=2000)  # Ajustez la largeur selon vos besoins
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Ajouter un titre pour tester
