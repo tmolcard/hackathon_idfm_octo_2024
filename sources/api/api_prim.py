@@ -1,4 +1,6 @@
 import os
+import re
+from typing import Literal
 import urllib.parse
 
 import requests
@@ -28,13 +30,28 @@ def get_place(adresse: str) -> str:
     return response_dict["places"][0]["id"]
 
 
-def call_recherche_itineraire(origin: str, destination: str, date: str) -> pd.DataFrame:
+def call_recherche_itineraire(
+    origin: str, destination: str, date: str, datetime_represents: Literal['departure', 'arrival'],
+    max_walking_duration_to_pt: int = None, wheelchair: bool = False
+) -> pd.DataFrame:
+    if re.match(r"\d+.\d+;\d+.\d+", origin):
+        origin_long_lat = origin
+    else:
+        origin_long_lat = get_place(origin)
+
+    destination_long_lat = get_place(destination)
+
     # URL de l'API
     params = {
-        'from': get_place(origin),
-        'to': get_place(destination),
+        'from': origin_long_lat,
+        'to': destination_long_lat,
         'datetime': date,
+        'datetime_represents': datetime_represents,
+        'wheelchair': wheelchair,
     }
+
+    if max_walking_duration_to_pt is not None:
+        params[max_walking_duration_to_pt] = max_walking_duration_to_pt
 
     url = API_BASE_URL_JOURNEY + urllib.parse.urlencode(params)
 

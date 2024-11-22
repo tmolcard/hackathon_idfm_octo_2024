@@ -22,6 +22,8 @@ API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
 MEMORY_KEY = "chat_history"
 CHAT_HISTORY = []
 
+TOOLS = [get_itineraire, get_info_trafic]
+
 azure_open_ai_parameters = {
     "api_version": API_VERSION,
     "azure_endpoint": AZURE_ENDPOINT,
@@ -31,24 +33,34 @@ azure_open_ai_parameters = {
 llm = AzureChatOpenAI(
     **azure_open_ai_parameters,
     model=os.getenv('AZURE_OPENAI_MODELS'),
-    temperature=0.5,
+    temperature=0.2,
 )
-llm_with_tools = llm.bind_tools([get_itineraire, get_info_trafic])
+
+llm_with_tools = llm.bind_tools(TOOLS)
 
 custom_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
             f"""
-                Vous êtes un assistant qui permet à un usager d'ile de France de trouver son
-                itineraire dans les transports d'ile de France.
+            Vous êtes un assistant spécialisé pour aider les usagers de l'Île-de-France à trouver leur itinéraire dans les transports en commun.
 
-                Nous sommes le {datetime.now().strftime("%Y-%m-%d")}.
-                Si l'utilisateur n'en fournit pas, considère que c'est la date et heure de départ.
-
-                Répond à l'utilisateur en 3 lignes maximum, en langage naturel, le texte sera lu.
+            Consignes :
+            Utilisez un langage simple et naturel, car le texte sera lu à voix haute.
+            Nous sommes le {datetime.now().strftime("%Y-%m-%d")}.
+            Il est {datetime.now().strftime("%H:%M:%S")}.
+            Si l'utilisateur n'en fournit pas, considère que c'est la date et heure de départ. 
+            Si le point de départ n’est pas précisé :
+            Utilisez la géolocalisation de l’usager si elle est disponible.
+            Sinon, invitez-le à l’activer ou à préciser son départ. Ne faites pas d’hypothèses.
+            Utilizez le point de départ s'il est précisé.
+            Répondez en 3 lignes maximum.
+            Fournissez la réponse en indiquant l'origine et la destination, la date de départ et la date d'arrivée et les étapes principales, comme suit :
+            Exemple :
+            En partant 56 Rue de Bagnolet au 34 avenue de l'Opéra aujourd'hui à 14h, vous arriverez à 14h38. Marchez 6 minutes jusqu'à la station Alexandre Dumas, puis prenez la ligne 2 pendant 3 minutes direction Porte Dauphine jusqu'à Père Lachaise. Changez pour la ligne 3 direction Pont de Levallois pendant 11 minutes et descendez à Opéra.
             """,
         ),
+        ("system", "User location: {user_location}"),
         MessagesPlaceholder(variable_name=MEMORY_KEY),
         ("user", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
@@ -58,6 +70,7 @@ custom_prompt = ChatPromptTemplate.from_messages(
 agent = (
     {
         "input": lambda x: x["input"],
+        "user_location": lambda x: x["user_location"],
         "agent_scratchpad": lambda x: format_to_openai_tool_messages(
             x["intermediate_steps"]
         ),
@@ -68,12 +81,13 @@ agent = (
     | OpenAIToolsAgentOutputParser()
 )
 
-agent_executor = AgentExecutor(agent=agent, tools=[get_itineraire, get_info_trafic], verbose=True)
+
+agent_executor = AgentExecutor(agent=agent, tools=TOOLS, verbose=True)
 
 
-def invoke_agent(message: str) -> str:
+def invoke_agent(message: str, location: str) -> str:
 
-    result = agent_executor.invoke({"input": message, "chat_history": CHAT_HISTORY})
+    result = agent_executor.invoke({"input": message, "user_location": location, "chat_history": CHAT_HISTORY})
 
     CHAT_HISTORY.extend(
         [
@@ -87,6 +101,7 @@ def invoke_agent(message: str) -> str:
 
 if __name__ == "__main__":
     invoke_agent(
-        #message=("Comment aller du 34 avenue de l'Opéra Paris au 89 rue saint Antoine Paris demain à 14h ?")
-        message=("Que se passe t'il sur le rer Z ?")
+        #message=("Je veux aller de la basilique Montmartre a la gare montparnasse")
+        message=("Que se passe t'il sur le rer E ?"),
+        location=None
     )
