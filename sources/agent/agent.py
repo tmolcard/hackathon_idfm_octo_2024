@@ -54,6 +54,9 @@ custom_prompt = ChatPromptTemplate.from_messages(
             Utilisez la géolocalisation de l’usager si elle est disponible.
             Sinon, invitez-le à l’activer ou à préciser son départ. Ne faites pas d’hypothèses.
             Mais utilisez le point de départ s'il est précisé.
+
+            Si la requête semble incomplete demandez plus de précisions.
+
             Répondez en 4 lignes maximum.
             Fournissez la réponse en indiquant l'origine et la destination, la date de départ et la date d'arrivée et les étapes principales, comme suit :
             Exemple :

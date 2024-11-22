@@ -20,10 +20,8 @@ st.markdown(
 
 
 st.markdown('<div class="center-logo">', unsafe_allow_html=True)
-st.image("images/logo_idfm.png", width=2000)  
+st.image("images/logo_idfm.png", width=2000)
 st.markdown('</div>', unsafe_allow_html=True)
-
-
 
 st.title("Recherchez votre itinéraire avec Mob'IA")
 st.markdown("""<span style='color: black;'>Bienvenue, appuyez sur "Enregistrer" pour enregistrer votre demande</span>""", unsafe_allow_html=True)
@@ -31,7 +29,6 @@ if location := streamlit_geolocation():
     if location.get('longitude') is not None:
         user_location = ';'.join([str(location.get('longitude')), str(location.get('latitude'))])
         st.markdown("""<span style='color: green;'>Geolocalisation active</span>""", unsafe_allow_html=True)
-
 
     else:
         user_location = "Inconnue"
