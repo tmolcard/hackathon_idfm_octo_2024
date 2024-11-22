@@ -14,4 +14,7 @@ def get_info_trafic(
     """
         Récupère les informations sur les potentiels problèmes des moyens de transport.
     """
-    return call_info_trafic(ligne)
+    try:
+        return call_info_trafic(ligne)
+    except Exception as err:
+        return f"Une erreur est survenue lors de la recherche d'info trafic: {err}"

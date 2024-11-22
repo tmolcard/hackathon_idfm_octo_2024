@@ -101,6 +101,6 @@ def invoke_agent(message: str, location: str) -> str:
 
 if __name__ == "__main__":
     invoke_agent(
-        message=("Je veux aller de la basilique Montmartre a la gare montparnasse"),
+        message=("Je veux aller de la basilique Montmartre a la gare Montparnasse"),
         location=None
     )

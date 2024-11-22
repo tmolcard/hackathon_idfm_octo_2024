@@ -30,12 +30,15 @@ def get_itineraire(
         Effectue une recherche d'itineraire permettant d'aller de origin à destination
         à une date donnée ou pour une date donnée.
     """
-    datetime_represents = "arrival" if datetime_represents == "arrivée" else 'departure'
-    date_str = jour + "T" + heure
-    return call_recherche_itineraire(
-        origin=origin, destination=destination,
-        date=date_str,
-        datetime_represents=datetime_represents,
-        max_walking_duration_to_pt=max_walking_duration_to_pt,
-        wheelchair=wheelchair
-    )
+    try:
+        datetime_represents = "arrival" if datetime_represents == "arrivée" else 'departure'
+        date_str = jour + "T" + heure
+        return call_recherche_itineraire(
+            origin=origin, destination=destination,
+            date=date_str,
+            datetime_represents=datetime_represents,
+            max_walking_duration_to_pt=max_walking_duration_to_pt,
+            wheelchair=wheelchair
+        )
+    except Exception as err:
+        return f"Une erreur est survenue lors de la recherche d'itineraire: {err}"
