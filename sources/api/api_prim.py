@@ -18,7 +18,7 @@ API_BASE_URL_INFO_TRAFIC = 'https://prim.iledefrance-mobilites.fr/marketplace/v2
 
 
 def get_place(adresse: str) -> str:
-    params = {'q': adresse}
+    params = {'q': adresse, 'from': "2.334934;48.86404"}
     url = API_BASE_URL_PLACES + urllib.parse.urlencode(params)
 
     # Envoi de la requête au serveur
