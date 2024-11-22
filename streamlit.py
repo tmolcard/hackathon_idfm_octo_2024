@@ -11,29 +11,31 @@ st.markdown(
     .center-logo {
         display: flex;
         justify-content: center;
-        align-items: center;
-        margin-top: 20px;
-        margin-bottom: 20px;
+        align-items: center
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
+
+st.markdown('<div class="center-logo">', unsafe_allow_html=True)
+st.image("images/logo_idfm.png", width=2000)  
+st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+st.title("Recherchez votre itinéraire avec Mob'IA")
+st.markdown("""<span style='color: black;'>Bienvenue, appuyez sur "Enregistrer" pour enregistrer votre demande</span>""", unsafe_allow_html=True)
 if location := streamlit_geolocation():
     if location.get('longitude') is not None:
         user_location = ';'.join([str(location.get('longitude')), str(location.get('latitude'))])
+        st.markdown("""<span style='color: green;'>Geolocalisation active</span>""", unsafe_allow_html=True)
+
+
     else:
         user_location = "Inconnue"
-
-# Utilisation de st.image pour charger le logo local
-st.markdown('<div class="center-logo">', unsafe_allow_html=True)
-st.image("sources/images/logo_idfm.png", width=2000)  # Ajustez la largeur selon vos besoins
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Ajouter un titre
-st.title("Assistant vocal recherche itinéraire")
-st.write("Bienvenue sur l'assistant vocal de recherche d'itinéraire!")
+        st.markdown("""<span style='color: red;'>Geolocation inactive</span>""", unsafe_allow_html=True)
 
 
 if 'button' not in st.session_state:
@@ -44,7 +46,7 @@ def click_button():
     st.session_state.button = True
 
 
-st.button("Enregistrement", on_click=click_button)
+st.button("Enregistrer", on_click=click_button)
 
 if st.session_state.button:
     user_input = recognize_speech()
