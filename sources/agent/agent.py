@@ -21,6 +21,8 @@ API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
 MEMORY_KEY = "chat_history"
 CHAT_HISTORY = []
 
+TOOLS = [get_itineraire]
+
 azure_open_ai_parameters = {
     "api_version": API_VERSION,
     "azure_endpoint": AZURE_ENDPOINT,
@@ -30,9 +32,9 @@ azure_open_ai_parameters = {
 llm = AzureChatOpenAI(
     **azure_open_ai_parameters,
     model=os.getenv('AZURE_OPENAI_MODELS'),
-    temperature=0.5,
+    temperature=0.2,
 )
-llm_with_tools = llm.bind_tools([get_itineraire])
+llm_with_tools = llm.bind_tools(TOOLS)
 
 custom_prompt = ChatPromptTemplate.from_messages(
     [
@@ -43,11 +45,16 @@ custom_prompt = ChatPromptTemplate.from_messages(
                 itineraire dans les transports d'ile de France.
 
                 Nous sommes le {datetime.now().strftime("%Y-%m-%d")}.
+                Il est {datetime.now().strftime("%H:%M:%S")}.
                 Si l'utilisateur n'en fournit pas, considère que c'est la date et heure de départ.
+
+                Si l'utilisateur ne précise pas de point de départ, utilise sa geolocation si elle t'est donnée,
+                si elle est inconnue demande lui de l'activer dans l'interface, n'invente rien.
 
                 Répond à l'utilisateur en 3 lignes maximum, en langage naturel, le texte sera lu.
             """,
         ),
+        ("system", "User location: {user_location}"),
         MessagesPlaceholder(variable_name=MEMORY_KEY),
         ("user", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
@@ -57,6 +64,7 @@ custom_prompt = ChatPromptTemplate.from_messages(
 agent = (
     {
         "input": lambda x: x["input"],
+        "user_location": lambda x: x["user_location"],
         "agent_scratchpad": lambda x: format_to_openai_tool_messages(
             x["intermediate_steps"]
         ),
@@ -67,12 +75,12 @@ agent = (
     | OpenAIToolsAgentOutputParser()
 )
 
-agent_executor = AgentExecutor(agent=agent, tools=[get_itineraire], verbose=True)
+agent_executor = AgentExecutor(agent=agent, tools=TOOLS, verbose=True)
 
 
-def invoke_agent(message: str) -> str:
+def invoke_agent(message: str, location: str) -> str:
 
-    result = agent_executor.invoke({"input": message, "chat_history": CHAT_HISTORY})
+    result = agent_executor.invoke({"input": message, "user_location": location, "chat_history": CHAT_HISTORY})
 
     CHAT_HISTORY.extend(
         [
@@ -89,5 +97,6 @@ if __name__ == "__main__":
         message=(
             "Comment aller du 34 avenue de l'Opéra Paris"
             "au 89 rue saint Antoine Paris demain à 14h ?"
-        )
+        ),
+        location=None
     )
