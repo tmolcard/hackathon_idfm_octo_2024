@@ -27,6 +27,11 @@ La recherche d'itinéraires s'effectue majoritairement via des applications ou d
 
 C’est à partir de ce constat qu’est né ce projet : un agent conversationnel intuitif et accessible dédié à la recherche d’itinéraires. Cet outil permet à tout utilisateur de dialoguer simplement en langage naturel pour connaître son itinéraire.
 
+De la sont ressorties deux problématiques : 
+- Comment faciliter l’usage des outils & données d’IDFM pour tous ?
+- Comment rendre les applications d’IDFM plus accessibles ?
+
+
 ### La solution
 
 Nous proposons une solution simple et accessible : un agent conversationnel fonctionnant en mode **speech-to-text-to-speech**. Ce système permet aux utilisateurs de dialoguer avec l’agent uniquement par la voix.
@@ -40,7 +45,7 @@ Nous proposons une solution simple et accessible : un agent conversationnel fonc
 - **Étape 3 : Retour d’information**  
   Une fois le trajet calculé, l’agent restitue les informations en langage naturel via un système de synthèse vocale (*text-to-speech*), en détaillant étape par étape les directions à suivre.
 
-Cette interaction vocale intuitive élimine les barrières liées aux interfaces complexes ou à la manipulation de technologies numériques avancées.
+
 
 ### Les problèmes surmontés
 > [!TIP]
@@ -48,14 +53,7 @@ Cette interaction vocale intuitive élimine les barrières liées aux interfaces
 ### Et la suite ? 
 Avec plus de temps et de ressources, une première évolution majeure consisterait à enrichir les fonctionnalités de recherche d’itinéraires en prenant en compte des paramètres supplémentaires :
 
-- État des infrastructures : Intégration des données en temps réel sur l’état des ascenseurs et escalators dans les gares et stations pour proposer des itinéraires adaptés aux personnes à mobilité réduite.
-- Accessibilité des lignes : Identification des lignes de bus et de métro accessibles (véhicules adaptés, quais sans marche, etc.).
+- État des infrastructures : Intégration des données en temps réel sur l’état des ascenseurs 
+- Données méteos : Intégration des données météorologiques pour indiquer de potentielles perturbations
 
-Ces optimisations contribueraient à rendre la solution encore plus inclusive et pertinente pour des publics ayant des besoins spécifiques.
-
-Une autre évolution possible serait la création d’un système multi-agent où :
-
-L’agent principal continuerait à gérer la recherche d’itinéraires.
-Un second agent doté d’un système de raisonnement automatisé (RAG, Retrieval-Augmented Generation) serait capable de répondre à des questions sur la FAQ.
-Ce deuxième agent permettrait d’élargir la portée du projet en offrant une assistance globale sur toutes les questions liées à la mobilité urbaine.
 
