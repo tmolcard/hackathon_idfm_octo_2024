@@ -1,4 +1,5 @@
 import os
+import re
 import urllib.parse
 
 import requests
@@ -27,10 +28,17 @@ def get_place(adresse: str) -> str:
 
 
 def call_recherche_itineraire(origin: str, destination: str, date: str):
+    if re.match(r"\d+.\d+;\d+.\d+", origin):
+        origin_long_lat = origin
+    else:
+        origin_long_lat = get_place(origin)
+
+    destination_long_lat = get_place(destination)
+
     # URL de l'API
     params = {
-        'from': get_place(origin),
-        'to': get_place(destination),
+        'from': origin_long_lat,
+        'to': destination_long_lat,
         'datetime': date,
     }
 

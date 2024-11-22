@@ -1,22 +1,20 @@
-from sources.api.api_prim import call_recherche_itineraire
-
+from typing import Annotated
 
 from langchain_core.tools import tool
 
-
-from typing import Annotated
+from sources.api.api_prim import call_recherche_itineraire
 
 
 @tool
 def get_itineraire(
     origin: Annotated[
-        str, "Point de départ sous la forme d'une adresse."],
+        str, "[Not null] Point de départ : une adresse ou une geolocation sous forme float;float."],
     destination: Annotated[
-        str, "Destination de l'itineraire recherché sous la forme d'une adresse."],
+        str, "[Not null] Destination de l'itineraire recherché sous la forme d'une adresse."],
     jour: Annotated[
-        str, "Jour à laquelle l'utilisateur veut partir au format : YYYYmmdd"],
+        str, "[Not null] Jour à laquelle l'utilisateur veut partir au format : YYYYmmdd"],
     heure: Annotated[
-        str, "Heure à laquelle l'utilisateur veut partir au format : HHMMSS"]
+        str, "[Not null] Heure à laquelle l'utilisateur veut partir au format : HHMMSS"]
 ) -> str:
     """
         Récupère un itineraire permettant d'aller de origin à destination à une date donnée.

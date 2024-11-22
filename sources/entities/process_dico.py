@@ -28,7 +28,7 @@ def process_dico(response: dict) -> dict:
             except KeyError:
                 continue
 
-    dicomax[f'Itineraire {itineraire['type']}'] = {
+    dicomax[f"Itineraire {itineraire['type']}"] = {
         "duration": itineraire["duration"],
         "nombre changement": itineraire["nb_transfers"],
         "heure de départ": itineraire["departure_date_time"],
