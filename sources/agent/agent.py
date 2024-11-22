@@ -7,6 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import AzureChatOpenAI
 
 from sources.agent.tools.get_itineraire import get_itineraire
+from sources.agent.tools.get_info_trafic import get_info_trafic
 
 
 from langchain.agents.format_scratchpad.openai_tools import (
@@ -32,7 +33,7 @@ llm = AzureChatOpenAI(
     model=os.getenv('AZURE_OPENAI_MODELS'),
     temperature=0.5,
 )
-llm_with_tools = llm.bind_tools([get_itineraire])
+llm_with_tools = llm.bind_tools([get_itineraire, get_info_trafic])
 
 custom_prompt = ChatPromptTemplate.from_messages(
     [
@@ -67,7 +68,7 @@ agent = (
     | OpenAIToolsAgentOutputParser()
 )
 
-agent_executor = AgentExecutor(agent=agent, tools=[get_itineraire], verbose=True)
+agent_executor = AgentExecutor(agent=agent, tools=[get_itineraire, get_info_trafic], verbose=True)
 
 
 def invoke_agent(message: str) -> str:
@@ -86,8 +87,6 @@ def invoke_agent(message: str) -> str:
 
 if __name__ == "__main__":
     invoke_agent(
-        message=(
-            "Comment aller du 34 avenue de l'Opéra Paris"
-            "au 89 rue saint Antoine Paris demain à 14h ?"
-        )
+        #message=("Comment aller du 34 avenue de l'Opéra Paris au 89 rue saint Antoine Paris demain à 14h ?")
+        message=("Que se passe t'il sur le rer Z ?")
     )
