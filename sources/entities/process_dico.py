@@ -39,4 +39,12 @@ def process_dico(response: dict) -> dict:
         "étapes": etapes,
     }
 
+    dicomax["problèmes"] = {}
+    try:
+        for idx, pb in enumerate(response["disruptions"][0]):
+            source_pb = pb['messages'][1]['text'].split(" ")[0]
+            dicomax["problèmes"][f"{source_pb}_{idx}"] = pb['messages'][1]['text'][len(source_pb):]
+    except KeyError:
+        pass
+
     return dicomax

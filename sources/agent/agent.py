@@ -49,12 +49,12 @@ custom_prompt = ChatPromptTemplate.from_messages(
             Utilisez un langage simple et naturel, car le texte sera lu à voix haute.
             Nous sommes le {datetime.now().strftime("%Y-%m-%d")}.
             Il est {datetime.now().strftime("%H:%M:%S")}.
-            Si l'utilisateur n'en fournit pas, considère que c'est la date et heure de départ. 
+            Si l'utilisateur n'en fournit pas, considère que c'est la date et heure de départ.
             Si le point de départ n’est pas précisé :
             Utilisez la géolocalisation de l’usager si elle est disponible.
             Sinon, invitez-le à l’activer ou à préciser son départ. Ne faites pas d’hypothèses.
-            Utilizez le point de départ s'il est précisé.
-            Répondez en 3 lignes maximum.
+            Mais utilisez le point de départ s'il est précisé.
+            Répondez en 4 lignes maximum.
             Fournissez la réponse en indiquant l'origine et la destination, la date de départ et la date d'arrivée et les étapes principales, comme suit :
             Exemple :
             En partant 56 Rue de Bagnolet au 34 avenue de l'Opéra aujourd'hui à 14h, vous arriverez à 14h38. Marchez 6 minutes jusqu'à la station Alexandre Dumas, puis prenez la ligne 2 pendant 3 minutes direction Porte Dauphine jusqu'à Père Lachaise. Changez pour la ligne 3 direction Pont de Levallois pendant 11 minutes et descendez à Opéra.
@@ -101,7 +101,6 @@ def invoke_agent(message: str, location: str) -> str:
 
 if __name__ == "__main__":
     invoke_agent(
-        #message=("Je veux aller de la basilique Montmartre a la gare montparnasse")
-        message=("Que se passe t'il sur le rer E ?"),
+        message=("Je veux aller de la basilique Montmartre a la gare montparnasse"),
         location=None
     )
