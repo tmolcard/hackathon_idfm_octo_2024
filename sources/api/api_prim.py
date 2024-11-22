@@ -6,6 +6,7 @@ import urllib.parse
 import requests
 import pandas as pd
 
+from sources.api.api_ilico import get_referentiel_ligne
 from sources.entities.process_dico import process_dico
 
 PRIM_API_TOKEN = os.environ['PRIM_API_TOKEN']
@@ -13,6 +14,7 @@ HEADERS = {'Accept': 'application/json', 'apikey': PRIM_API_TOKEN}
 
 API_BASE_URL_PLACES = 'https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/places?'
 API_BASE_URL_JOURNEY = 'https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/journeys?'
+API_BASE_URL_INFO_TRAFIC = 'https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/line_reports/'
 
 
 def get_place(adresse: str) -> str:
@@ -31,7 +33,7 @@ def get_place(adresse: str) -> str:
 def call_recherche_itineraire(
     origin: str, destination: str, date: str, datetime_represents: Literal['departure', 'arrival'],
     max_walking_duration_to_pt: int = None, wheelchair: bool = False
-):
+) -> pd.DataFrame:
     if re.match(r"\d+.\d+;\d+.\d+", origin):
         origin_long_lat = origin
     else:
@@ -59,6 +61,22 @@ def call_recherche_itineraire(
         raise ValueError(f"Error code {response.status_code}: {response.text}")
     response = pd.json_normalize(response.json())
     return process_dico(response)
+
+
+def call_info_trafic(ligne: str | None = None) -> pd.DataFrame:
+    df_ilico = get_referentiel_ligne()
+    try:
+        code_ligne = df_ilico.loc[df_ilico['name_line'] == ligne, 'id_line'].iloc[0]
+    except IndexError:
+        return pd.DataFrame({'Error': ['Ligne non existante']})
+
+    url = f"{API_BASE_URL_INFO_TRAFIC}{urllib.parse.quote(f'lines/line:IDFM:{code_ligne}', safe='')}/line_reports"
+
+    response = requests.get(url, headers=HEADERS)
+
+    if response.status_code != 200:
+        raise ValueError(f"Error code {response.status_code}: {response.text}")
+    return pd.json_normalize(response.json()['disruptions'])
 
 
 if __name__ == "__main__":
