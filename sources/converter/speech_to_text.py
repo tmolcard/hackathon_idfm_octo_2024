@@ -7,7 +7,8 @@ def recognize_speech() -> str:
     with sr.Microphone() as source:
         try:
             st.info("Enregistrement en cours")
-            audio = recognizer.listen(source, timeout=15)
+            recognizer.adjust_for_ambient_noise(source, duration=1)
+            audio = recognizer.listen(source, timeout=30)
             st.success("Traitement en cours")
             text = recognizer.recognize_google(audio, language="fr-FR")
         except sr.UnknownValueError:
